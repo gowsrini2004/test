@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Happy New Year</title>
+</head>
+<body>
+  <h1>🎉 Happy New Year! 🎉</h1>
+  <p>Click the button below to receive a personalized New Year greeting!</p>
+  <button id="getLocation">Get My Location</button>
+  <p id="message"></p>
+
+  <script>
+    document.getElementById("getLocation").addEventListener("click", () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+
+            // Send location to the backend
+            fetch('http://localhost:5000/location', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ latitude, longitude }),
+            })
+            .then(response => response.json())
+            .then(data => {
+              document.getElementById("message").textContent = "Thank you! Your location has been recorded.";
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              document.getElementById("message").textContent = "Error sending location.";
+            });
+          },
+          () => {
+            document.getElementById("message").textContent = "Location access denied.";
+          }
+        );
+      } else {
+        document.getElementById("message").textContent = "Geolocation is not supported by your browser.";
+      }
+    });
+  </script>
+</body>
+</html>
